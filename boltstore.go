@@ -67,6 +67,9 @@ func (s *BoltStore) Get(key string, v interface{}) (err error) {
 	err = s.db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(s.bucket))
 		val := b.Get([]byte(key))
+		if val == nil {
+			return NoSuchKeyError{key}
+		}
 		return json.Unmarshal(val, &v)
 	})
 	return
