@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/boltdb/bolt"
+	bolt "go.etcd.io/bbolt"
 )
 
 // NoSuchKeyError is thrown when calling Get with invalid key
