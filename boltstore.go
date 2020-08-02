@@ -75,6 +75,32 @@ func (s *BoltStore) Get(key string, v interface{}) (err error) {
 	return
 }
 
+// GetAll will iterate over everything and return things
+// that have the same type as the interface passed
+func (s *BoltStore) GetAll(v interface{}, keyvalue func(key string) error) (err error) {
+	s.RLock()
+	defer s.RUnlock()
+
+	err = s.db.View(func(tx *bolt.Tx) error {
+		// Assume bucket exists and has keys
+		b := tx.Bucket([]byte(s.bucket))
+		c := b.Cursor()
+		for k, val := c.First(); k != nil; k, val = c.Next() {
+			errkv := json.Unmarshal(val, &v)
+			if errkv != nil {
+				continue
+			}
+			errkv = keyvalue(string(k))
+			if errkv != nil {
+				return errkv
+			}
+		}
+		return nil
+	})
+
+	return err
+}
+
 // Keys returns all the keys currently in map
 func (s *BoltStore) Keys() []string {
 	s.RLock()

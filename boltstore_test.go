@@ -1,6 +1,7 @@
 package boltstore
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"strconv"
@@ -53,6 +54,16 @@ func TestGeneral(t *testing.T) {
 
 	keys := ks.Keys()
 	assert.Equal(t, []string{"hello", "human:1"}, keys)
+
+	err = ks.Set("human:2", Human{"Dante2", 5.5})
+	assert.Nil(t, err)
+	err = ks.Set("human:3", Human{"Dante3", 5.6})
+	assert.Nil(t, err)
+	err = ks.GetAll(&human, func(key string) error {
+		fmt.Println(key, human)
+		return nil
+	})
+	assert.Nil(t, err)
 
 	err = ks.Delete("human:1")
 	assert.Nil(t, err)
